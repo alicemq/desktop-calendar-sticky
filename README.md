@@ -1,9 +1,9 @@
-Creating windows widget for three month calendar
+Creating windows widget for three month calendar. <br>
 Localized for Lithuania (holidays and month names)
 
 # Screnshots #
-![Application](https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/App.png?raw=true)
-![Screenshot](https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/desktop.png?raw=true)
+<img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/desktop.png?raw=true" width="300"> <nobr>
+<img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/App.png?raw=true" width="200">
 
 # TODO #
 * test year change
