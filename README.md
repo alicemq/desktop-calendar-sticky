@@ -2,8 +2,8 @@ Creating windows widget for three month calendar. <br>
 Localized for Lithuania (holidays and month names)
 
 # Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64-setup.exe)
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64_en-US.msi)
+[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64-setup.exe)<br>
+[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64_en-US.msi)<br><br>
 [All releases](https://github.com/alicemq/desktop-calendar-sticky/releases/tag/Windows)
 
 # Screnshots #
