@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "desktop-calendar-sticky",
+  "version": "0.1.0",
+  "identifier": "com.desktop-calendar-sticky.app",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "desktop-calendar-sticky",
+        "width": 250,
+        "height": 650,
+        "decorations": false,
+        "alwaysOnTop":false,
+        "dragDropEnabled": false,
+        "devtools":true,
+        "resizable": true,
+        "transparent": true,
+        "shadow": false,
+        "zoomHotkeysEnabled": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+  
+}

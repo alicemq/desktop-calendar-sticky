@@ -3,16 +3,8 @@
     <head>
         <title>Wall Calendar Widget</title>
         <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta charset="UTF-8">
         <script type="text/javascript">
-        function makeAlwaysOnTop() {
-            try {
-                var shell = new ActiveXObject("Shell.Application");
-                shell.TileVertically(); // Temporary workaround to ensure it stays on top
-                window.focus();
-            } catch (e) {
-                console.log("ActiveX blocked, cannot set always on top.");
-            }
-        }
 
         function enableDragging() {
             var offsetX, offsetY, isDragging = false;
@@ -44,170 +36,11 @@
 
         window.onload = init;
     </script>
-        <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
-            padding: 20px;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-            /* cursor: move; Indicate it's draggable */
-        }
-        .calendar:first-child{
-            margin-top: 5px;
-        }
-        .calendar {
-            display: inline-block;
-            margin: 2.5px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .calendar-header {
-            font-size: 15px;
-            margin-bottom: 5px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: 30px repeat(7, 30px);
-            gap: 0px;
-        }
-        .calendar-day {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-        .calendar-day.other-month {
-            color: #ccc;
-        }
-        .workday {
-    background-color: #e6ffe6; /* Light green for workdays */
-}
-
-.weekend {
-    background-color: #ffebcc; /* Light orange for weekends */
-}
-
-.holiday {
-    background-color: rgba(255, 43, 43, 0.89); /* Red for holidays */
-}
-
-.today {
-    background-color: #73ff73;
-    border: 5px solid #ed0e0e;
-    font-weight: bold;
-}
-
-        .week-number {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f0f0f0;
-            font-size: 12px;
-            color: #777;
-        }
-        .weekday {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* font-weight: bold; */
-            background-color: #f0f0f0;
-        }
-        .p {
-  text-align: left;
-}
-    
-.secondSpan {
-    transform: translate(-50%, -110%);
-    max-height: 120px;
-}
-    
-.firstSpan .secondSpan {
-  visibility: hidden;
-  width: 120px;
-  background-color: gray;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px;
-  position: absolute;
-  z-index: 1;
-
-}
-    
-.firstSpan:hover .secondSpan {
-  visibility: visible;
-}
-
-/* Tooltip container */
-.tooltip-container {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    text-align: center;
-    display: flex;
-}
-
-/* Tooltip text (hidden by default) */
-.tooltip-container::after {
-    content: attr(data-tooltip); /* Get tooltip text from data attribute */
-    visibility: hidden;
-    opacity: 0;
-    width: max-content;
-    max-width: 150px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 5px;
-    position: absolute;
-    bottom: 125%; /* Position above the element */
-    left: 50%;
-    transform: translateX(-50%);
-    transition: opacity 0.2s ease-in-out;
-    pointer-events: none;
-    font-size: 12px;
-    white-space: nromal;
-    z-index: 1000; /* Ensure tooltip is above everything */
-}
-
-/* Show tooltip on hover */
-.tooltip-container:hover::after {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Flip tooltip if near top edge */
-.tooltip-container.tooltip-bottom::after {
-    bottom: auto;
-    top: 125%;
-}
-
-/* Shift left if near right edge */
-.tooltip-container.tooltip-left::after {
-    left: auto;
-    right: 0;
-    transform: none;
-}
-
-/* Shift right if near left edge */
-.tooltip-container.tooltip-right::after {
-    left: 0;
-    transform: none;
-}
-    </style>
+        
+        <link rel="stylesheet" href="styles.css">
     </head>
-    <body>
+    <body data-tauri-drag-region>
+        <div class="drag-overlay" data-tauri-drag-region></div>
         <div class="calendar" id="current-month-calendar"></div>
         <div class="calendar" id="second-month-calendar"></div>
         <div class="calendar" id="third-month-calendar"></div>
@@ -330,13 +163,8 @@ window.addEventListener("resize", adjustTooltipPositions);
                     calendarHtml += '<div class="week-number">W' + weekNumber + '</div>';
                 }
 
-                // Add title attribute for holiday tooltip
-                // var titleAttr = isHoliday ? '<span class="secondSpan">' + holiday.name + '</span>' : '';
-                // calendarHtml += '<div class="' + dayClass + '"' + '><span class="firstSpan">' + day + titleAttr +'</span></div>';
-
-                // <span class="firstSpan">over me<span class="secondSpan">Some text.</span></span>
           // Apply tooltip if it's a holiday
-                var tooltipAttr = isHoliday ? ' data-tooltip="' + holiday.name + '"' : "";
+                var tooltipAttr = isHoliday ? ' data-tooltip="' + holiday.name + '" data-tauri-drag-region' : "";
                 if (isHoliday) dayClass +=" tooltip-container"
                 calendarHtml += '<div class="' + dayClass + '"' + tooltipAttr + '>' + day + '</div>';
             }
