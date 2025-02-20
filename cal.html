@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wall Calendar Widget</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <script type="text/javascript">
+        function makeAlwaysOnTop() {
+            try {
+                var shell = new ActiveXObject("Shell.Application");
+                shell.TileVertically(); // Temporary workaround to ensure it stays on top
+                window.focus();
+            } catch (e) {
+                console.log("ActiveX blocked, cannot set always on top.");
+            }
+        }
+
+        function enableDragging() {
+            var offsetX, offsetY, isDragging = false;
+
+            document.onmousedown = function (e) {
+                isDragging = true;
+                offsetX = e.clientX - document.body.getBoundingClientRect().left;
+                offsetY = e.clientY - document.body.getBoundingClientRect().top;
+                return false;
+            };
+
+            document.onmousemove = function (e) {
+                if (isDragging) {
+                    window.moveTo(e.screenX - offsetX, e.screenY - offsetY);
+                }
+            };
+
+            document.onmouseup = function () {
+                isDragging = false;
+            };
+        }
+
+        function init() {
+            window.resizeTo(300, 200); // Set default size
+            window.moveTo(100, 100);   // Set initial position
+            enableDragging();
+            setInterval(makeAlwaysOnTop, 2000); // Keep it on top
+        }
+
+        window.onload = init;
+    </script>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            /* cursor: move; Indicate it's draggable */
+        }
+        .calendar:first-child{
+            margin-top: 5px;
+        }
+        .calendar {
+            display: inline-block;
+            margin: 2.5px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .calendar-header {
+            font-size: 15px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 30px repeat(7, 30px);
+            gap: 0px;
+        }
+        .calendar-day {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+        .workday {
+    background-color: #e6ffe6; /* Light green for workdays */
+}
+
+.weekend {
+    background-color: #ffebcc; /* Light orange for weekends */
+}
+
+.holiday {
+    background-color: rgba(255, 43, 43, 0.89); /* Red for holidays */
+}
+
+.today {
+    background-color: #73ff73;
+    border: 5px solid #ed0e0e;
+    font-weight: bold;
+}
+
+        .week-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            font-size: 12px;
+            color: #777;
+        }
+        .weekday {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* font-weight: bold; */
+            background-color: #f0f0f0;
+        }
+        .p {
+  text-align: left;
+}
+    
+.secondSpan {
+    transform: translate(-50%, -110%);
+    max-height: 120px;
+}
+    
+.firstSpan .secondSpan {
+  visibility: hidden;
+  width: 120px;
+  background-color: gray;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+
+}
+    
+.firstSpan:hover .secondSpan {
+  visibility: visible;
+}
+
+/* Tooltip container */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+}
+
+/* Tooltip text (hidden by default) */
+.tooltip-container::after {
+    content: attr(data-tooltip); /* Get tooltip text from data attribute */
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    max-width: 150px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    bottom: 125%; /* Position above the element */
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.2s ease-in-out;
+    pointer-events: none;
+    font-size: 12px;
+    white-space: nromal;
+    z-index: 1000; /* Ensure tooltip is above everything */
+}
+
+/* Show tooltip on hover */
+.tooltip-container:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Flip tooltip if near top edge */
+.tooltip-container.tooltip-bottom::after {
+    bottom: auto;
+    top: 125%;
+}
+
+/* Shift left if near right edge */
+.tooltip-container.tooltip-left::after {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
+/* Shift right if near left edge */
+.tooltip-container.tooltip-right::after {
+    left: 0;
+    transform: none;
+}
+    </style>
+    </head>
+    <body>
+        <div class="calendar" id="current-month-calendar"></div>
+        <div class="calendar" id="second-month-calendar"></div>
+        <div class="calendar" id="third-month-calendar"></div>
+
+        <script type="text/javascript">
+            function adjustTooltipPositions() {
+    document.querySelectorAll('.tooltip-container').forEach(el => {
+        let rect = el.getBoundingClientRect();
+        let tooltipWidth = 150; // Max tooltip width
+        let margin = 10; // Safety margin from edges
+
+        // Remove previous classes
+        el.classList.remove("tooltip-bottom", "tooltip-left", "tooltip-right");
+
+        // If too close to the top, move tooltip below
+        if (rect.top < 50) {
+            el.classList.add("tooltip-bottom");
+        }
+
+        // If too close to the right edge, shift left
+        if (rect.left + tooltipWidth > window.innerWidth - margin) {
+            el.classList.add("tooltip-left");
+        }
+
+        // If too close to the left edge, shift right
+        if (rect.left < margin) {
+            el.classList.add("tooltip-right");
+        }
+    });
+}
+
+// Run function after calendar is generated
+setTimeout(adjustTooltipPositions, 100);
+window.addEventListener("resize", adjustTooltipPositions);
+
+        function getEasterDate(year) {
+            var a = year % 19;
+            var b = Math.floor(year / 100);
+            var c = year % 100;
+            var d = Math.floor(b / 4);
+            var e = b % 4;
+            var f = Math.floor((b + 8) / 25);
+            var g = Math.floor((b - f + 1) / 3);
+            var h = (19 * a + b - d - g + 15) % 30;
+            var i = Math.floor(c / 4);
+            var k = c % 4;
+            var l = (32 + 2 * e + 2 * i - h - k) % 7;
+            var m = Math.floor((a + 11 * h + 22 * l) / 451);
+            var month = Math.floor((h + l - 7 * m + 114) / 31);
+            var day = ((h + l - 7 * m + 114) % 31) + 1;
+            return { month: month - 1, day: day }; // month is 0-indexed
+        }
+
+        function generateCalendar(year, month, elementId) {
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+            var firstDay = new Date(year, month, 1).getDay();
+            firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Adjust to make Monday the first day
+            var lastDayPrevMonth = new Date(year, month, 0).getDate();
+            var today = new Date();
+
+            // Lithuanian holidays (month is 0-indexed, i.e., January is 0)
+            var easter = getEasterDate(year);
+            var holidays = [
+                { month: 0, day: 1, name: "Naujųjų metų diena" },
+                { month: 1, day: 16, name: "Lietuvos valstybės atkūrimo diena" },
+                { month: 2, day: 11, name: "Lietuvos nepriklausomybės atkūrimo diena" },
+                { month: easter.month, day: easter.day, name: "Velykų sekmadienis" },
+                { month: easter.month, day: easter.day + 1, name: "Velykų pirmadienis" },
+                { month: 4, day: 1, name: "Tarptautinė darbo diena" },
+                { month: 5, day: 24, name: "Rasos ir Joninių diena" },
+                { month: 6, day: 6, name: "Valstybės diena" },
+                { month: 7, day: 15, name: "Žolinė" },
+                { month: 10, day: 1, name: "Visų Šventųjų diena" },
+                { month: 10, day: 2, name: "Vėlinės" },
+                { month: 11, day: 24, name: "Kūčios" },
+                { month: 11, day: 25, name: "Kalėdos" },
+                { month: 11, day: 26, name: "Antroji Kalėdų diena" }
+            ];
+
+            var calendarHtml = '<div class="calendar-header">' + new Date(year, month, 1).toLocaleString('lt-LT', { month: 'long', year: 'numeric' }) + '</div>';
+            calendarHtml += '<div class="calendar-grid">';
+
+            // Weekday abbreviations
+            calendarHtml += '<div class="week-number"></div>';
+            calendarHtml += '<div class="weekday">Mo</div>';
+            calendarHtml += '<div class="weekday">Tu</div>';
+            calendarHtml += '<div class="weekday">We</div>';
+            calendarHtml += '<div class="weekday">Th</div>';
+            calendarHtml += '<div class="weekday">Fr</div>';
+            calendarHtml += '<div class="weekday">Sa</div>';
+            calendarHtml += '<div class="weekday">Su</div>';
+
+            // Week number display
+            var weekNumber = getWeekNumber(new Date(year, month, 1));
+            calendarHtml += '<div class="week-number">W' + weekNumber + '</div>';
+
+            // Previous month days
+            for (var i = firstDay; i > 0; i--) {
+                calendarHtml += '<div class="calendar-day other-month">' + (lastDayPrevMonth - i + 1) + '</div>';
+            }
+
+            // Current month days
+            for (var day = 1; day <= daysInMonth; day++) {
+                var currentDate = new Date(year, month, day);
+                 var isToday = (currentDate.getFullYear() === today.getFullYear() &&
+                       currentDate.getMonth() === today.getMonth() &&
+                       currentDate.getDate() === today.getDate());
+                var isWeekend = (currentDate.getDay() === 6 || currentDate.getDay() === 0); // Saturday (6) or Sunday (0)
+                var holiday = holidays.find(holiday => holiday.month === month && holiday.day === day);
+                var isHoliday = holiday;
+                var dayClass = "calendar-day";
+                if (isToday) dayClass += " today";
+                if (isHoliday) dayClass += " holiday";
+                if (isWeekend) dayClass += " weekend";
+                else dayClass += " workday";
+                
+                // Insert week number before Mondays
+                if (currentDate.getDay() === 1 && day != 1) {
+                    weekNumber = getWeekNumber(currentDate);
+                    calendarHtml += '<div class="week-number">W' + weekNumber + '</div>';
+                }
+
+                // Add title attribute for holiday tooltip
+                // var titleAttr = isHoliday ? '<span class="secondSpan">' + holiday.name + '</span>' : '';
+                // calendarHtml += '<div class="' + dayClass + '"' + '><span class="firstSpan">' + day + titleAttr +'</span></div>';
+
+                // <span class="firstSpan">over me<span class="secondSpan">Some text.</span></span>
+          // Apply tooltip if it's a holiday
+                var tooltipAttr = isHoliday ? ' data-tooltip="' + holiday.name + '"' : "";
+                if (isHoliday) dayClass +=" tooltip-container"
+                calendarHtml += '<div class="' + dayClass + '"' + tooltipAttr + '>' + day + '</div>';
+            }
+
+            // Next month days to fill the grid
+            var nextMonthDay = 1;
+            while ((firstDay + daysInMonth + nextMonthDay - 1) % 7 !== 0 || nextMonthDay === 1) {
+                calendarHtml += '<div class="calendar-day other-month">' + nextMonthDay + '</div>';
+                nextMonthDay++;
+            }
+
+            calendarHtml += '</div>';
+            document.getElementById(elementId).innerHTML = calendarHtml;
+        }
+
+        function getWeekNumber(date) {
+            var firstDay = new Date(date.getFullYear(), 0, 1).getDay();
+            var days = Math.floor((date - new Date(date.getFullYear(), 0, 1)) / 86400000);
+            return Math.ceil((days + firstDay) / 7);
+        }
+
+        function updateCalendars() {
+            var now = new Date();
+            generateCalendar(now.getFullYear(), now.getMonth(), 'current-month-calendar');
+            generateCalendar(now.getFullYear(), now.getMonth() + 1, 'second-month-calendar');
+            generateCalendar(now.getFullYear(), now.getMonth() + 2, 'third-month-calendar');
+        }
+
+        updateCalendars();
+        setInterval(updateCalendars, 1000 * 60 * 60 * 24); // Update every day
+    </script>
+    </body>
+</html>
