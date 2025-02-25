@@ -1,80 +1,213 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Wall Calendar Widget</title>
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta charset="UTF-8">
-        <script type="text/javascript">
 
-        function enableDragging() {
-            var offsetX, offsetY, isDragging = false;
-
-            document.onmousedown = function (e) {
-                isDragging = true;
-                offsetX = e.clientX - document.body.getBoundingClientRect().left;
-                offsetY = e.clientY - document.body.getBoundingClientRect().top;
-                return false;
-            };
-
-            document.onmousemove = function (e) {
-                if (isDragging) {
-                    window.moveTo(e.screenX - offsetX, e.screenY - offsetY);
-                }
-            };
-
-            document.onmouseup = function () {
-                isDragging = false;
-            };
-        }
-
-        function init() {
-            window.resizeTo(300, 200); // Set default size
-            window.moveTo(100, 100);   // Set initial position
-            enableDragging();
-            setInterval(makeAlwaysOnTop, 2000); // Keep it on top
-        }
-
-        window.onload = init;
+<head>
+    <title>Wall Calendar Widget</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="UTF-8">
+    <script type="text/javascript">
     </script>
-        
-        <link rel="stylesheet" href="styles.css">
-    </head>
-    <body data-tauri-drag-region>
-        <div class="drag-overlay" data-tauri-drag-region></div>
-        <div class="calendar" id="current-month-calendar"></div>
-        <div class="calendar" id="second-month-calendar"></div>
-        <div class="calendar" id="third-month-calendar"></div>
 
-        <script type="text/javascript">
-            function adjustTooltipPositions() {
-    document.querySelectorAll('.tooltip-container').forEach(el => {
-        let rect = el.getBoundingClientRect();
-        let tooltipWidth = 150; // Max tooltip width
-        let margin = 10; // Safety margin from edges
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="bootstrap.min.css">
+</head>
 
-        // Remove previous classes
-        el.classList.remove("tooltip-bottom", "tooltip-left", "tooltip-right");
+<body>
+    <div class="calendar-content" id="all-calendars">
+    </div>
+    <div class="drag-overlay" id="tauri-drag" data-tauri-drag-region></div>
 
-        // If too close to the top, move tooltip below
-        if (rect.top < 50) {
-            el.classList.add("tooltip-bottom");
+    <button onclick="toggleSettingsMenu()" class="settings-icon btn btn-secondary" alt="Settings"> <svg
+            xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill"
+            viewBox="0 0 16 16">
+            <path
+                d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+        </svg></button>
+
+
+    <div class="settings-menu" id="settings-menu">
+        <label for="locale">Locale:</label>
+        <select id="locale" class="form-control">
+        </select>
+
+        <label for="monthsToGenerate">Months to Generate:</label>
+        <input type="number" id="monthsToGenerate" class="form-control">
+
+        <label for="monthsOffset">Months Offset:</label>
+        <input type="number" id="monthsOffset" class="form-control">
+
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="draggable">
+            <label for="draggable"> Draggable</label>
+        </div>
+
+        <button onclick="applySettings()" class="btn btn-primary mt-2">Apply</button>
+    </div>
+
+    <script>
+        const { invoke } = window.__TAURI__.core;
+        const { listen } = window.__TAURI__.event;
+
+        // Function to apply the zoom level when the window is loaded or resized
+        function applyZoom(zoomLevel) {
+            document.body.style.zoom = zoomLevel + '%';
+
+            // Send the zoom level to the backend to be saved
+            invoke('set_zoom', { zoom: parseFloat(zoomLevel) })
+                .then(() => {
+                    console.log(`Zoom level ${zoomLevel}% saved.`);
+                })
+                .catch((error) => {
+                    console.error("Error saving zoom level:", error);
+                });
         }
 
-        // If too close to the right edge, shift left
-        if (rect.left + tooltipWidth > window.innerWidth - margin) {
-            el.classList.add("tooltip-left");
+        // Function to get the stored zoom level or default to 100 if not found
+        function getStoredZoom() {
+            return parseFloat(localStorage.getItem('zoom')) || 100;
         }
 
-        // If too close to the left edge, shift right
-        if (rect.left < margin) {
-            el.classList.add("tooltip-right");
-        }
-    });
-}
+        // Apply zoom on initial page load
+        var initialZoom = getStoredZoom();
+        applyZoom(initialZoom);
 
-// Run function after calendar is generated
-setTimeout(adjustTooltipPositions, 100);
-window.addEventListener("resize", adjustTooltipPositions);
+        // Function to update zoom on window resize
+        window.addEventListener("resize", function () {
+            var zoomLevel = ((window.outerWidth - 10) / window.innerWidth) * 100;
+            applyZoom(zoomLevel); // Update zoom and save it to backend
+            localStorage.setItem('zoom', zoomLevel); // Optionally, store it locally as well
+        });
+
+        // Function to retrieve zoom level from backend and apply it
+        function retrieveZoomFromBackend() {
+            invoke('get_zoom')
+                .then((zoomLevel) => {
+                    applyZoom(zoomLevel);
+                    console.log(`Zoom level ${zoomLevel}% retrieved.`);
+                })
+                .catch((error) => {
+                    console.error("Error retrieving zoom level:", error);
+                });
+        }
+
+        // Retrieve zoom level from backend on initial page load
+        retrieveZoomFromBackend();
+    </script>
+    <script type="text/javascript">
+
+        // Retrieve and validate stored settings
+        var locale = localStorage.getItem('locale');
+
+        if (!locale) {
+            locale = "en-US";  // Set the default
+            localStorage.setItem('locale', locale);
+        }
+        var monthsToGenerate = parseInt(localStorage.getItem('monthsToGenerate'));
+        if (isNaN(monthsToGenerate)) {
+            localStorage.setItem('monthsToGenerate', 3);
+            monthsToGenerate = 3; // Set the fallback value directly
+        }
+        var monthsOffset = parseInt(localStorage.getItem('monthsOffset'));
+        if (isNaN(monthsOffset)) {
+            localStorage.setItem('monthsOffset', 0);
+            monthsOffset = 0; // Set the fallback value directly
+        }
+        var draggable = localStorage.getItem("draggable") === "true"; // Ensure it's a proper boolean
+
+        // Function to apply stored settings to UI elements
+        function loadSettings() {
+            document.getElementById('locale').value = locale;
+            document.getElementById('monthsToGenerate').value = monthsToGenerate;
+            document.getElementById('monthsOffset').value = parseInt(monthsOffset);
+            document.getElementById('draggable').checked = draggable;
+
+            // Apply settings visually
+            tauridraggable();
+
+        }
+        function tauridraggable() {
+            document.querySelectorAll('#tauri-drag').forEach(element => {
+                if (draggable) {
+                    element.setAttribute('data-tauri-drag-region', '');
+                    // element.style.display = 'block';
+                    console.log('Draggable enabled');
+                } else {
+                    element.removeAttribute('data-tauri-drag-region');
+                    // element.style.display = 'none';
+                    console.log('Draggable disabled');
+                }
+            });
+        }
+        // Function to apply and store settings
+        function applySettings() {
+            locale = document.getElementById('locale').value;
+            monthsToGenerate = parseInt(document.getElementById('monthsToGenerate').value) || 3;
+            monthsOffset = parseInt(document.getElementById('monthsOffset').value) || 0;
+            draggable = document.getElementById('draggable').checked;
+
+            // Store updated values
+            localStorage.setItem('locale', locale);
+            localStorage.setItem('monthsToGenerate', monthsToGenerate);
+            localStorage.setItem('monthsOffset', monthsOffset);
+            localStorage.setItem('draggable', draggable.toString()); // Ensure it's stored as "true" or "false"
+
+            // Apply settings visually
+            tauridraggable();
+            updateCalendars();
+            toggleSettingsMenu();
+        }
+
+        // Load settings when page loads
+        window.onload = function () {
+            loadSettings();
+            document.addEventListener('dragstart', function (event) {
+                event.preventDefault();
+                let resizeTimeout;
+
+                window.addEventListener('resize', function () {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        let step = 245;
+
+                        let width = Math.round(window.innerWidth / step) * step;
+                        let height = Math.round(window.innerHeight / step) * step;
+
+                        window.resizeTo(width, height);
+                    }, 500); // Adjust delay if needed
+                });
+
+            });
+        }
+
+        function adjustTooltipPositions() {
+            document.querySelectorAll('.tooltip-container').forEach(el => {
+                let rect = el.getBoundingClientRect();
+                let tooltipWidth = 150; // Max tooltip width
+                let margin = 10; // Safety margin from edges
+
+                // Remove previous classes
+                el.classList.remove("tooltip-bottom", "tooltip-left", "tooltip-right");
+
+                // If too close to the top, move tooltip below
+                if (rect.top < 50) {
+                    el.classList.add("tooltip-bottom");
+                }
+
+                // If too close to the right edge, shift left
+                if (rect.left + tooltipWidth > window.innerWidth - margin) {
+                    el.classList.add("tooltip-left");
+                }
+
+                // If too close to the left edge, shift right
+                if (rect.left < margin) {
+                    el.classList.add("tooltip-right");
+                }
+            });
+        }
+
+        // Run function after calendar is generated
+        setTimeout(adjustTooltipPositions, 100);
+        window.addEventListener("resize", adjustTooltipPositions);
 
         function getEasterDate(year) {
             var a = year % 19;
@@ -100,6 +233,7 @@ window.addEventListener("resize", adjustTooltipPositions);
             firstDay = (firstDay === 0) ? 6 : firstDay - 1; // Adjust to make Monday the first day
             var lastDayPrevMonth = new Date(year, month, 0).getDate();
             var today = new Date();
+            // today = new Date(2025, 1, 16);
 
             // Lithuanian holidays (month is 0-indexed, i.e., January is 0)
             var easter = getEasterDate(year);
@@ -120,60 +254,67 @@ window.addEventListener("resize", adjustTooltipPositions);
                 { month: 11, day: 26, name: "Antroji Kalėdų diena" }
             ];
 
-            var calendarHtml = '<div class="calendar-header">' + new Date(year, month, 1).toLocaleString('lt-LT', { month: 'long', year: 'numeric' }) + '</div>';
+            // var calendarHtml = '<div class="calendar" id=' + elementId + '>';
+            var calendarHtml = '<div class="calendar-header">' + new Date(year, month, 1).toLocaleString(locale, { month: 'long', year: 'numeric' }) + '</div>';
             calendarHtml += '<div class="calendar-grid">';
 
             // Weekday abbreviations
-            calendarHtml += '<div class="week-number"></div>';
-            calendarHtml += '<div class="weekday">Mo</div>';
-            calendarHtml += '<div class="weekday">Tu</div>';
-            calendarHtml += '<div class="weekday">We</div>';
-            calendarHtml += '<div class="weekday">Th</div>';
-            calendarHtml += '<div class="weekday">Fr</div>';
-            calendarHtml += '<div class="weekday">Sa</div>';
-            calendarHtml += '<div class="weekday">Su</div>';
+            calendarHtml += '<div class="week-number calendar-item"></div>';
+            calendarHtml += '<div class="weekday calendar-item">Mo</div>';
+            calendarHtml += '<div class="weekday calendar-item">Tu</div>';
+            calendarHtml += '<div class="weekday calendar-item">We</div>';
+            calendarHtml += '<div class="weekday calendar-item">Th</div>';
+            calendarHtml += '<div class="weekday calendar-item">Fr</div>';
+            calendarHtml += '<div class="weekday calendar-item">Sa</div>';
+            calendarHtml += '<div class="weekday calendar-item">Su</div>';
 
             // Week number display
             var weekNumber = getWeekNumber(new Date(year, month, 1));
-            calendarHtml += '<div class="week-number">W' + weekNumber + '</div>';
+            calendarHtml += '<div class="week-number calendar-item">W' + weekNumber + '</div>';
 
             // Previous month days
             for (var i = firstDay; i > 0; i--) {
-                calendarHtml += '<div class="calendar-day other-month">' + (lastDayPrevMonth - i + 1) + '</div>';
+                calendarHtml += '<div class="calendar-day other-month calendar-item">' + (lastDayPrevMonth - i + 1) + '</div>';
             }
 
             // Current month days
             for (var day = 1; day <= daysInMonth; day++) {
                 var currentDate = new Date(year, month, day);
-                 var isToday = (currentDate.getFullYear() === today.getFullYear() &&
-                       currentDate.getMonth() === today.getMonth() &&
-                       currentDate.getDate() === today.getDate());
+                var isToday = (currentDate.getFullYear() === today.getFullYear() &&
+                    currentDate.getMonth() === today.getMonth() &&
+                    currentDate.getDate() === today.getDate());
                 var isWeekend = (currentDate.getDay() === 6 || currentDate.getDay() === 0); // Saturday (6) or Sunday (0)
                 var holiday = holidays.find(holiday => holiday.month === month && holiday.day === day);
                 var isHoliday = holiday;
                 var dayClass = "calendar-day";
                 if (isToday) dayClass += " today";
-                if (isHoliday) dayClass += " holiday";
+                if (isHoliday) dayClass += " holiday holiday-drag";
                 if (isWeekend) dayClass += " weekend";
                 else dayClass += " workday";
-                
+
                 // Insert week number before Mondays
                 if (currentDate.getDay() === 1 && day != 1) {
                     weekNumber = getWeekNumber(currentDate);
-                    calendarHtml += '<div class="week-number">W' + weekNumber + '</div>';
+                    calendarHtml += '<div class="week-number calendar-item">W' + weekNumber + '</div>';
                 }
 
-          // Apply tooltip if it's a holiday
-                var tooltipAttr = isHoliday ? ' data-tooltip="' + holiday.name + '" data-tauri-drag-region' : "";
-                if (isHoliday) dayClass +=" tooltip-container"
-                calendarHtml += '<div class="' + dayClass + '"' + tooltipAttr + '>' + day + '</div>';
+                // Apply tooltip if it's a holiday
+                var tooltipAttr = isHoliday ? ' data-tooltip="' + holiday.name + '"' : "";
+                if (isHoliday) dayClass += " tooltip-container"
+                calendarHtml += '<div class="' + dayClass + ' calendar-item "' + tooltipAttr + '>' + (isHoliday ? '<div class="holiday-drag holi-top" data-tauri-drag-region id="tauri-drag"></div>' : '') + day + '</div>';
             }
 
             // Next month days to fill the grid
             var nextMonthDay = 1;
-            while ((firstDay + daysInMonth + nextMonthDay - 1) % 7 !== 0 || nextMonthDay === 1) {
-                calendarHtml += '<div class="calendar-day other-month">' + nextMonthDay + '</div>';
-                nextMonthDay++;
+            var nextMonthFirstDay = new Date(year, month + 1, 1).getDay(); // Get the first day of the next month
+
+            // Skip the next month if the first day is a Monday
+            if (nextMonthFirstDay != 1) {
+                while ((firstDay + daysInMonth + nextMonthDay - 1) % 7 !== 0 || nextMonthDay === 1) {
+                    // Generate the next month's day
+                    calendarHtml += '<div class="calendar-day other-month calendar-item">' + nextMonthDay + '</div>';
+                    nextMonthDay++;
+                }
             }
 
             calendarHtml += '</div>';
@@ -181,20 +322,209 @@ window.addEventListener("resize", adjustTooltipPositions);
         }
 
         function getWeekNumber(date) {
-            var firstDay = new Date(date.getFullYear(), 0, 1).getDay();
-            var days = Math.floor((date - new Date(date.getFullYear(), 0, 1)) / 86400000);
-            return Math.ceil((days + firstDay) / 7);
+            let year = date.getFullYear();
+            let thursdayOfWeek = new Date(date);
+            thursdayOfWeek.setDate(date.getDate() + (4 - (date.getDay() || 7))); // Find the Thursday of this week
+
+            let firstThursday = new Date(thursdayOfWeek.getFullYear(), 0, 4);
+            firstThursday.setDate(firstThursday.getDate() + (4 - (firstThursday.getDay() || 7))); // Find first Thursday of the year
+
+            let weekNumber = Math.ceil(((thursdayOfWeek - firstThursday) / 86400000 + 1) / 7);
+
+            return weekNumber;
         }
+
+
 
         function updateCalendars() {
             var now = new Date();
-            generateCalendar(now.getFullYear(), now.getMonth(), 'current-month-calendar');
-            generateCalendar(now.getFullYear(), now.getMonth() + 1, 'second-month-calendar');
-            generateCalendar(now.getFullYear(), now.getMonth() + 2, 'third-month-calendar');
-        }
+            // debug
+            now = new Date(2025, 1, 16);
+            //end debug
+            var allCalendars = document.getElementById('all-calendars');
 
+            // Clear the current content before appending new calendars
+            allCalendars.innerHTML = '';
+
+            for (var i = monthsOffset; i < monthsToGenerate + monthsOffset; i++) {
+                // Calculate the correct month and year for each iteration
+                var currentMonth = now.getMonth() + i;  // Adjust the month with offset
+                var yearOffset = Math.floor(currentMonth / 12);  // Check if we need to go back or forward a year
+
+                // Adjust the final year and month based on the overflow of months
+                var finalYear = now.getFullYear() + yearOffset;
+                var finalMonth = currentMonth % 12;  // Get the correct month (0-11)
+
+                // If the calculated month is negative (for past months), adjust the year accordingly
+                if (finalMonth < 0) {
+                    finalMonth += 12;
+                    finalYear -= 1;
+                }
+
+                // Create a container for the month calendar
+                var monthCalendar = document.createElement('div');
+                monthCalendar.id = 'month-calendar-' + i;
+                monthCalendar.className = 'calendar';
+
+                // Append the newly created container to the all-calendars container
+                allCalendars.appendChild(monthCalendar);
+
+                // Now generate the calendar inside the new container
+                generateCalendar(finalYear, finalMonth, monthCalendar.id);
+            }
+        }
         updateCalendars();
         setInterval(updateCalendars, 1000 * 60 * 60 * 24); // Update every day
+
+        function toggleSettingsMenu() {
+            var menu = document.getElementById('settings-menu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
+
+
+        // List of locales and their corresponding language names
+        var localeNames = {
+            "ach": "Acholi",
+            "af": "Afrikaans",
+            "an": "Aragonese",
+            "ar": "Arabic",
+            "ast": "Asturian",
+            "az": "Azerbaijani",
+            "be": "Belarusian",
+            "bg": "Bulgarian",
+            "bn": "Bengali",
+            "br": "Breton",
+            "bs": "Bosnian",
+            "ca": "Catalan",
+            "ca-valencia": "Valencian Catalan",
+            "cak": "K'iche'",
+            "cs": "Czech",
+            "cy": "Welsh",
+            "da": "Danish",
+            "de": "German",
+            "dsb": "Lower Sorbian",
+            "el": "Greek",
+            "en-CA": "English (Canada)",
+            "en-GB": "English (UK)",
+            "en-US": "English (US)",
+            "eo": "Esperanto",
+            "es-AR": "Spanish (Argentina)",
+            "es-CL": "Spanish (Chile)",
+            "es-ES": "Spanish (Spain)",
+            "es-MX": "Spanish (Mexico)",
+            "et": "Estonian",
+            "eu": "Basque",
+            "fa": "Persian",
+            "ff": "Fulah",
+            "fi": "Finnish",
+            "fr": "French",
+            "fy-NL": "Frisian (Netherlands)",
+            "ga-IE": "Irish",
+            "gd": "Scottish Gaelic",
+            "gl": "Galician",
+            "gn": "Guarani",
+            "gu-IN": "Gujarati",
+            "he": "Hebrew",
+            "hi-IN": "Hindi",
+            "hr": "Croatian",
+            "hsb": "Upper Sorbian",
+            "hu": "Hungarian",
+            "hy-AM": "Armenian",
+            "ia": "Interlingua",
+            "id": "Indonesian",
+            "is": "Icelandic",
+            "it": "Italian",
+            "ja": "Japanese",
+            "ka": "Georgian",
+            "kab": "Kabyle",
+            "kk": "Kazakh",
+            "km": "Khmer",
+            "kn": "Kannada",
+            "ko": "Korean",
+            "lij": "Ligurian",
+            "lt": "Lithuanian",
+            "lv": "Latvian",
+            "mk": "Macedonian",
+            "mr": "Marathi",
+            "ms": "Malay",
+            "my": "Burmese",
+            "nb-NO": "Norwegian Bokmål",
+            "ne-NP": "Nepali",
+            "nl": "Dutch",
+            "nn-NO": "Norwegian Nynorsk",
+            "oc": "Occitan",
+            "pa-IN": "Punjabi",
+            "pl": "Polish",
+            "pt-BR": "Portuguese (Brazil)",
+            "pt-PT": "Portuguese (Portugal)",
+            "rm": "Romansh",
+            "ro": "Romanian",
+            "ru": "Russian",
+            "sco": "Scots",
+            "si": "Sinhala",
+            "sk": "Slovak",
+            "sl": "Slovenian",
+            "son": "Songhai",
+            "sq": "Albanian",
+            "sr": "Serbian",
+            "sv-SE": "Swedish",
+            "szl": "Silesian",
+            "ta": "Tamil",
+            "te": "Telugu",
+            "th": "Thai",
+            "tl": "Tagalog",
+            "tr": "Turkish",
+            "trs": "Tigrinya",
+            "uk": "Ukrainian",
+            "ur": "Urdu",
+            "uz": "Uzbek",
+            "vi": "Vietnamese",
+            "xh": "Xhosa",
+            "zh-CN": "Chinese (Simplified)",
+            "zh-TW": "Chinese (Traditional)"
+        };
+
+        // Function to check if a locale is supported
+        function isLocaleSupported(locale) {
+            try {
+                // Using a try-catch block to check for supported locales
+                return Intl.DisplayNames.supportedLocalesOf([locale]).length > 0;
+            } catch (e) {
+                return false; // Locale is not supported
+            }
+        }
+
+        // Function to create a list of <option> elements dynamically with language names
+        function createLocaleOptions() {
+            var selectElement = document.getElementById('locale'); // Assuming a <select> with id 'locale-select'
+            var userLocale = "lt-LT";  // Default locale (Lithuanian)
+            var browserLocale = navigator.language || userLocale; // Fallback to default locale if not found
+
+            // Check if the user's locale is supported by the browser
+            if (!isLocaleSupported(browserLocale)) {
+                // If not supported, use the fallback default locale
+                browserLocale = userLocale;
+            }
+
+            // Sort and add locales to the dropdown
+            Object.keys(localeNames).sort().forEach(function (locale) {
+                if (isLocaleSupported(locale)) {
+                    var option = document.createElement('option');
+                    option.value = locale;
+                    option.textContent = localeNames[locale]; // Use the human-readable name
+                    selectElement.appendChild(option);
+                }
+            });
+
+            // Optionally, set the default selected locale in the dropdown
+            selectElement.value = browserLocale;  // Set the user's or fallback locale as the default
+        }
+
+        // Run the function to populate the options
+        createLocaleOptions();
+
     </script>
-    </body>
+</body>
+
 </html>

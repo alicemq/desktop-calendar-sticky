@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  background-color: #f0f0f0 !important;
   text-align: center;
   margin: auto;
   overflow: hidden;
@@ -9,7 +9,18 @@ body {
   height: 100%;
   /* cursor: move; Indicate it's draggable */
 }
+.calendar-item {
+  cursor: default;
+}
 
+::selection {
+  background-color: initial;
+  color: inherit;
+}
+
+/* * {
+  pointer-events: none;
+} */
 .drag-overlay {
   position: absolute;
   top: 0;
@@ -18,23 +29,43 @@ body {
   height: 100%;
   /* background-color: rgba(0, 0, 0, 0.5); */
   z-index: 1;
-  /* display: none; */
+  display: block;
+}
+
+.holiday-drag {
+  width: 100%;
+  height: 100%;            
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.holi-top {
+  z-index: 9;
 }
 
 .calendar:first-child {
-  margin-top: 5px;
+  margin-top: 0.313rem;
+}
+
+.calendar-content {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
+  align-content: space-around;
 }
 
 .calendar {
-  display: inline-block;
-  margin: 2.5px;
+  display: block;
+  margin: 0.156rem;
   text-align: left;
   vertical-align: top;
 }
 
 .calendar-header {
-  font-size: 15px;
-  margin-bottom: 5px;
+  font-size: 1.05rem;
+  margin-bottom: 0.313rem;
   text-align: center;
   font-weight: bold;
   /* color: white; */
@@ -45,19 +76,20 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: 30px repeat(7, 30px);
-  gap: 0px;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
+  grid-template-rows: auto 1fr auto;
 }
 
 .calendar-day {
-  width: 30px;
-  height: 30px;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #fff;
-  border: 1px solid #ddd;
-  font-size: 14px;
+  border: 0.05rem solid #ddd;
+  font-size: 1rem;
   box-sizing: border-box;
 }
 
@@ -76,13 +108,13 @@ body {
 }
 
 .holiday {
-  background-color: rgba(255, 43, 43, 0.89);
+  background-color: rgb(253 137 137);
   /* Red for holidays */
 }
 
 .today {
-  background-color: #73ff73;
-  border: 5px solid #ed0e0e;
+  /* background-color: #73ff73; */
+  border: 0.313rem solid #ed0e0e;
   font-weight: bold;
 }
 
@@ -91,7 +123,7 @@ body {
   align-items: center;
   justify-content: center;
   background-color: #f0f0f0;
-  font-size: 12px;
+  font-size: 1rem;
   color: #777;
 }
 
@@ -109,20 +141,19 @@ body {
 
 .secondSpan {
   transform: translate(-50%, -110%);
-  max-height: 120px;
+  max-height: 7.5rem;
 }
 
 .firstSpan .secondSpan {
   visibility: hidden;
-  width: 120px;
+  width: 7.5rem;
   background-color: gray;
   color: #fff;
   text-align: center;
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: 0.375rem;
+  padding: 0.313rem;
   position: absolute;
   z-index: 1;
-
 }
 
 .firstSpan:hover .secondSpan {
@@ -146,12 +177,12 @@ body {
   visibility: hidden;
   opacity: 0;
   width: max-content;
-  max-width: 150px;
+  max-width: 10rem;
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   text-align: center;
-  border-radius: 5px;
-  padding: 5px;
+  border-radius: 0.313rem;
+  padding: 0.313rem;
   position: absolute;
   bottom: 125%;
   /* Position above the element */
@@ -159,8 +190,8 @@ body {
   transform: translateX(-50%);
   transition: opacity 0.2s ease-in-out;
   pointer-events: none;
-  font-size: 12px;
-  white-space: nromal;
+  font-size: 0.75rem;
+  white-space: normal;
   z-index: 2;
   /* Ensure tooltip is above everything */
 }
@@ -188,4 +219,40 @@ body {
 .tooltip-container.tooltip-right::after {
   left: 0;
   transform: none;
+}
+
+button.settings-icon {
+  position: fixed;
+  top: 0.125rem;
+  right: 0.125rem;
+  cursor: pointer;
+  z-index: 4;
+  opacity: 0.2;
+  padding: 0;
+  align-items: center;
+  display: flex;
+}
+
+.settings-menu {
+  position: fixed;
+  top: 3.125rem;
+  right: 0.625rem;
+  background-color: white;
+  border: 0.063rem solid #ddd;
+  padding: 0.625rem;
+  box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
+  z-index: 4;
+  display: none;
+}
+
+.settings-menu label {
+  display: block;
+  margin-bottom: 0.313rem;
+}
+
+.settings-menu input {
+  width: 100%;
+  margin-bottom: 0.625rem;
+  padding: 0.313rem;
+  box-sizing: border-box;
 }

@@ -1,12 +1,18 @@
 {
   "name": "desktop-calendar-sticky",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "tauri": "tauri"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-store": "^2.2.0",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3"
   }
 }
