@@ -1,7 +1,6 @@
 Creating windows widget for three month calendar. <br>
 Localized for Lithuania (holidays and month names)
 
-<<<<<<< HEAD
 # Features #
 * Settings menu:
   *   Change locale (display of language of month and year)
@@ -17,23 +16,23 @@ Localized for Lithuania (holidays and month names)
 * Need to fix windows position, size and zoom state saving
 
 # Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.1_x64-setup.exe)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.1_x64_en-US.msi)<br><br>
+[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.msi)<br>
+[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.exe)<br><br>
+
 =======
 # Download #
 [MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64-setup.exe)<br>
 [EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64_en-US.msi)<br><br>
->>>>>>> 2a0b4d58574a8e77bd9635fd9d327469fa051653
+
 [All releases](https://github.com/alicemq/desktop-calendar-sticky/releases/tag/Windows)
 
 # Screnshots #
 <img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/desktop.png?raw=true" width="300"> <nobr>
 <img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/App.png?raw=true" width="200">
-<<<<<<< HEAD
+
 <img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/settings.png?raw=true" width="200">
 
 =======
->>>>>>> 2a0b4d58574a8e77bd9635fd9d327469fa051653
 
 # TODO #
 * add settings for colors
