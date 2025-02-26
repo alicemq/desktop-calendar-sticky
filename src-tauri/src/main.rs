@@ -3,8 +3,6 @@
 use dirs_next::config_dir;
 use serde::{Deserialize, Serialize};
 use std::fs;
-use std::str::FromStr;
-use std::string::ToString;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -15,7 +13,6 @@ use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize, WindowEvent};
 struct WindowState {
     position: Option<(i32, i32)>,
     size: Option<(u32, u32)>,
-    zoom: Option<f64>,
 }
 
 // Function to get the user-writable config path
@@ -26,7 +23,7 @@ fn get_config_path() -> PathBuf {
         .join("window_state.json") // Change this to your app's name
 }
 
-// Function to load the saved window state (including zoom)
+// Function to load the saved window state
 fn get_saved_state() -> WindowState {
     let path = get_config_path();
     if let Ok(contents) = fs::read_to_string(&path) {
@@ -37,7 +34,7 @@ fn get_saved_state() -> WindowState {
     WindowState::default()
 }
 
-// Function to save window state (position, size, zoom level)
+// Function to save window state (position, size)
 fn save_window_state(state: &WindowState) {
     let path = get_config_path();
 
@@ -68,13 +65,6 @@ fn main() {
                 if let Some((width, height)) = state.size {
                     let _ = window.set_size(PhysicalSize::new(width, height));
                 }
-
-                if let Some(zoom) = state.zoom {
-                    // Log to check if zoom is correctly being applied
-                    eprintln!("Restoring zoom: {}", zoom);
-                    // Set the zoom on the window
-                    let _ = window.eval(&format!("document.body.style.zoom = '{}%'", zoom));
-                }
             } else {
                 eprintln!("Main window not found.");
             }
@@ -83,7 +73,7 @@ fn main() {
         })
         .on_window_event({
             let state = state.clone();
-            move |app_handle, event| {
+            move |_app_handle, event| {
                 let mut state = state.lock().unwrap();
 
                 match event {
@@ -96,48 +86,13 @@ fn main() {
                     _ => {}
                 }
 
-                // Get the current zoom level from the frontend
-                if let Some(window) = app_handle.get_webview_window("main") {
-                    let _ = window.eval(r#"
-                        window.__TAURI__.invoke('get_zoom').then(zoom => {
-                            window.__TAURI__.invoke('set_zoom', { zoom: parseFloat(zoom) });
-                        });
-                    "#);
-                }
-
                 // Save the updated state
                 save_window_state(&state);
             }
         })
-        .invoke_handler(tauri::generate_handler![set_zoom, get_zoom]) // Register the zoom getter handler
         .plugin(prevent_default())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-}
-
-// Tauri command to save the zoom level
-#[tauri::command]
-fn set_zoom(zoom: f64) {
-    let mut state = get_saved_state();
-    eprintln!("{:?}", state); // Debug log
-    state.zoom = Some(zoom);
-    eprintln!("Setting zoom level: {}", state.zoom.unwrap()); // Debug log
-    save_window_state(&state); // Save the zoom level
-    if let Some(saved_zoom) = get_saved_state().zoom {
-        eprintln!("Saved state zoom level: {}", saved_zoom); // Debug log
-    } else {
-        eprintln!("Zoom level not found in saved state."); // Debug log
-    }
-}
-
-// Tauri command to get the zoom level
-#[tauri::command]
-fn get_zoom() -> f64 {
-    let state = get_saved_state();
-    // eprintln!("{:?}", state); // Debug log
-    let zoom_level = state.zoom.unwrap_or(100.0); // Default to 100 if not set
-    eprintln!("Retrieved zoom level: {}", zoom_level); // Debug log
-    zoom_level // Return the saved zoom level or default to 100
 }
 
 // Prevent default plugin (unchanged)
