@@ -16,13 +16,9 @@ Localized for Lithuania (holidays and month names)
 * Need to fix windows position, size and zoom state saving
 
 # Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.msi)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.exe)<br><br>
+[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.4_x64_en-US.msi)<br>
+[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.4_x64_en-US.exe)<br><br>
 
-=======
-# Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64-setup.exe)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64_en-US.msi)<br><br>
 
 [All releases](https://github.com/alicemq/desktop-calendar-sticky/releases/tag/Windows)
 
