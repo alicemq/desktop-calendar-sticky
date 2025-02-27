@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0 !important;
+  /* background-color: #f0f0f0 !important; */
   text-align: center;
   margin: auto;
   overflow: hidden;
@@ -8,7 +8,10 @@ body {
   width: 100%;
   height: 100%;
   /* cursor: move; Indicate it's draggable */
+  border-radius: 4px;
+  transition: border 0.2s ease-in-out;
 }
+
 .calendar-item {
   cursor: default;
 }
@@ -34,11 +37,12 @@ body {
 
 .holiday-drag {
   width: 100%;
-  height: 100%;            
+  height: 100%;
   position: absolute;
   top: 0;
   left: 0;
 }
+
 .holi-top {
   z-index: 9;
 }
@@ -61,6 +65,8 @@ body {
   margin: 0.156rem;
   text-align: left;
   vertical-align: top;
+  border-radius: var(--bs-border-radius) !important;
+  background-color: #f0f0f0;
 }
 
 .calendar-header {
@@ -111,12 +117,13 @@ body {
   /* background-color: rgb(253 137 137); */
   /* Red for holidays */
 }
+
 .other-holiday {
   background-color: rgb(142, 255, 246);
   /* Red for holidays */
 }
 
-.bank-holiday{
+.bank-holiday {
   background-color: rgb(253 137 137);
   /* Red for holidays */
 }
@@ -231,9 +238,6 @@ body {
 }
 
 button.settings-icon {
-  position: fixed;
-  top: 0.125rem;
-  right: 0.125rem;
   cursor: pointer;
   z-index: 4;
   opacity: 0.2;
@@ -241,34 +245,35 @@ button.settings-icon {
   align-items: center;
   display: flex;
   z-index: 9;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
 }
 
 .settings-menu {
-  /* display: flex; */
   flex-direction: column;
-  flex-wrap: wrap;
   position: fixed;
-  top: 0.625rem;
-  right: 0.625rem;
+  top: 0;
   background-color: white;
   border: 0.063rem solid #ddd;
   padding: 0.625rem;
   box-shadow: 0 0.125rem 0.625rem rgba(0, 0, 0, 0.1);
-  z-index: 4;
-display: none;
-  margin-bottom: 0.625rem;
-  max-height: 90vh; /* Set a maximum height relative to the viewport height */
-  max-width: 90vw; /* Set a maximum width relative to the viewport width */
-  overflow-y: auto; /* Enable vertical scrolling if content overflows */
-  overflow-x: auto; /* Enable horizontal scrolling if content overflows */
-  /* padding: 10px; Add some padding for better appearance */
-  box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+  z-index: 99;
+  display: none;
+  zoom: 73%;
+  max-height: 98%;
+  max-width: 98%;
+  overflow-y: auto;
+  overflow-x: auto;
+
+  box-sizing: border-box;
 }
 
 /* Optional: Add some styles for the scrollbar */
 .settings-menu::-webkit-scrollbar {
-  width: 8px;
-  height: 8px; /* Add height for horizontal scrollbar */
+  width: 15px;
+  height: 15px;
 }
 
 .settings-menu::-webkit-scrollbar-thumb {
@@ -295,18 +300,19 @@ display: none;
 
 .settings-item {
   display: block;
-  margin:  0 0.625rem;
+  margin: 0 0.625rem;
 }
+
 .range-wrap {
   /* position: relative; */
 
   display: flex;
-    
-  justify-content: center; 
-  align-items: center; 
-  /* flex-flow: row nowrap; */ 
-  flex-direction: row; 
-  flex-wrap: nowrap; 
+
+  justify-content: center;
+  align-items: center;
+  /* flex-flow: row nowrap; */
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-content: center;
 
   height: 100%;
@@ -323,12 +329,31 @@ display: none;
   padding: 4px 4px;
   display: block;
   border-radius: 4px;
-  align-self:center;
-  flex-grow:1;
+  align-self: center;
+  flex-grow: 1;
 
 }
+
+input[type="color"] {
+  -webkit-appearance: none;
+  /* border: none; */
+  /* width: 25% !important; */
+  padding: 0;
+  border-radius: 4px;
+  height: auto;
+  margin: 0;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
 input.range {
-  /* float: left;
-  width: 80%;
-margin: 0px; */
+  width: 75%;
 }

@@ -1,5 +1,9 @@
-Creating windows widget for three month calendar. <br>
-Localized for Lithuania (holidays and month names)
+Creating windows widget for three month calendar. 
+<br>
+Now with AI<br>
+
+Localized for Lithuania (holidays and month names) - proofed
+Localized for others - used AI to generate code, mistakes are possible
 
 # Features #
 * Settings menu:
@@ -10,19 +14,15 @@ Localized for Lithuania (holidays and month names)
     *  0 - no impact - current month will be first
     *  Positive number - will show months into future
   *  Option to make window non-draggable
+  * holidays
 
 # Bugs #
 * Zooming is buggy, might need to experiment with multiple reloads, and overzooming
 * Need to fix windows position, size and zoom state saving
 
 # Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.msi)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/0.1.1/Desktop.calendar.widget_0.1.1_x64_en-US.exe)<br><br>
-
-=======
-# Download #
-[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64-setup.exe)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/desktop-calendar-sticky_0.1.0_x64_en-US.msi)<br><br>
+[MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/Desktop.calendar.widget_0.1.5_x64_en-US.msi)<br>
+[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/Desktop.calendar.widget_0.1.5_x64_en-US.exe)<br><br>
 
 [All releases](https://github.com/alicemq/desktop-calendar-sticky/releases/tag/Windows)
 
@@ -31,6 +31,7 @@ Localized for Lithuania (holidays and month names)
 <img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/App.png?raw=true" width="200">
 
 <img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/settings.png?raw=true" width="200">
+<img src="https://github.com/alicemq/desktop-calendar-sticky/blob/main/src-tauri/screenshots/overview_with_settings.png?raw=true" width="200">
 
 =======
 
