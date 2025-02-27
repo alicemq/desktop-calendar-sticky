@@ -78,7 +78,7 @@ var holidaysByCountry = {
             { month: fathers.month, day: fathers.day, bankHoliday: false, nameNative: "Tėvo diena", nameEnglish: "Father's Day" },
             { month: 5, day: 24, bankHoliday: true, nameNative: "Joninės", nameEnglish: "St. John's Day" },
             { month: 6, day: 6, bankHoliday: true, nameNative: "Valstybės (Lietuvos karaliaus Mindaugo karūnavimo) diena", nameEnglish: "State Day (Coronation of King Mindaugas)" },
-            { month: 8, day: 15, bankHoliday: true, nameNative: "Žolinė (Švč. Mergelės Marijos ėmimo į dangų diena)", nameEnglish: "Assumption Day" },
+            { month: 7, day: 15, bankHoliday: true, nameNative: "Žolinė (Švč. Mergelės Marijos ėmimo į dangų diena)", nameEnglish: "Assumption Day" },
             { month: 9, day: 1, bankHoliday: false, nameNative: "Mokslo ir žinių diena", nameEnglish: "Knowledge Day" },
             { month: 10, day: 1, bankHoliday: true, nameNative: "Visų šventųjų diena", nameEnglish: "All Saints' Day" },
             { month: 10, day: 2, bankHoliday: true, nameNative: "Vėlinės", nameEnglish: "All Souls' Day" },
