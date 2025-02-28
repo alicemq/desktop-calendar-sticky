@@ -22,7 +22,7 @@ Localized for others - used AI to generate code, mistakes are possible
 
 # Download #
 [MSI installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/Desktop.calendar.widget_0.1.5_x64_en-US.msi)<br>
-[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/Desktop.calendar.widget_0.1.5_x64_en-US.exe)<br><br>
+[EXE installer](https://github.com/alicemq/desktop-calendar-sticky/releases/download/Windows/Desktop.calendar.widget_0.1.5_x64-setup.exe)<br><br>
 
 [All releases](https://github.com/alicemq/desktop-calendar-sticky/releases/tag/Windows)
 
